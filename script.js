@@ -690,3 +690,187 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
+// Product Portfolio Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Product Grid View Toggle
+    const viewToggleBtn = document.getElementById('viewToggleBtn');
+    const hiddenProducts = document.querySelectorAll('.hidden-product');
+    let isExpanded = false;
+    
+    if (viewToggleBtn) {
+        viewToggleBtn.addEventListener('click', function() {
+            if (!isExpanded) {
+                // Show all products
+                hiddenProducts.forEach(product => {
+                    product.style.display = 'block';
+                    product.classList.add('fade-in-visible');
+                });
+                viewToggleBtn.textContent = 'View Less';
+                isExpanded = true;
+            } else {
+                // Hide extra products
+                hiddenProducts.forEach(product => {
+                    product.style.display = 'none';
+                    product.classList.remove('fade-in-visible');
+                });
+                viewToggleBtn.textContent = 'View All';
+                isExpanded = false;
+                
+                // Scroll back to portfolio section
+                document.getElementById('portfolio').scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    }
+    
+    // Product Lightbox Functionality
+    const productItems = document.querySelectorAll('.product-item img');
+    const productLightbox = document.querySelector('.product-lightbox');
+    const productLightboxImage = document.querySelector('.product-lightbox-image');
+    const productLightboxClose = document.querySelector('.product-lightbox-close');
+    const productLightboxPrev = document.querySelector('.product-lightbox-prev');
+    const productLightboxNext = document.querySelector('.product-lightbox-next');
+    
+    let currentProductIndex = 0;
+    let allProductImages = [];
+    
+    // Create array of all product images (visible and hidden)
+    function updateProductImages() {
+        allProductImages = Array.from(document.querySelectorAll('.product-item img'));
+    }
+    
+    // Initialize product images array
+    updateProductImages();
+    
+    // Function to show product in lightbox
+    function showProductInLightbox(index) {
+        if (index >= 0 && index < allProductImages.length) {
+            currentProductIndex = index;
+            productLightboxImage.src = allProductImages[index].src;
+            productLightboxImage.alt = allProductImages[index].alt;
+            productLightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    
+    // Function to show previous product
+    function showPreviousProduct() {
+        const prevIndex = (currentProductIndex - 1 + allProductImages.length) % allProductImages.length;
+        showProductInLightbox(prevIndex);
+    }
+    
+    // Function to show next product
+    function showNextProduct() {
+        const nextIndex = (currentProductIndex + 1) % allProductImages.length;
+        showProductInLightbox(nextIndex);
+    }
+    
+    // Add click event to all product images
+    function addProductClickEvents() {
+        const currentProductItems = document.querySelectorAll('.product-item img');
+        currentProductItems.forEach((img, index) => {
+            img.addEventListener('click', function(e) {
+                e.preventDefault();
+                updateProductImages(); // Update array to include newly visible items
+                const globalIndex = allProductImages.indexOf(this);
+                showProductInLightbox(globalIndex);
+            });
+        });
+    }
+    
+    // Initialize product click events
+    addProductClickEvents();
+    
+    // Re-add events when view toggle is used
+    if (viewToggleBtn) {
+        viewToggleBtn.addEventListener('click', function() {
+            setTimeout(() => {
+                updateProductImages();
+                addProductClickEvents();
+            }, 100);
+        });
+    }
+    
+    // Navigation controls
+    if (productLightboxPrev) {
+        productLightboxPrev.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showPreviousProduct();
+        });
+    }
+    
+    if (productLightboxNext) {
+        productLightboxNext.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showNextProduct();
+        });
+    }
+    
+    // Close lightbox
+    if (productLightboxClose) {
+        productLightboxClose.addEventListener('click', () => {
+            productLightbox.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+    }
+    
+    // Close on outside click
+    if (productLightbox) {
+        productLightbox.addEventListener('click', (e) => {
+            if (e.target === productLightbox) {
+                productLightbox.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+    }
+    
+    // Keyboard navigation for product lightbox
+    document.addEventListener('keydown', (e) => {
+        if (!productLightbox || !productLightbox.classList.contains('active')) return;
+        
+        switch(e.key) {
+            case 'Escape':
+                productLightbox.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                break;
+            case 'ArrowLeft':
+                e.preventDefault();
+                showPreviousProduct();
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                showNextProduct();
+                break;
+        }
+    });
+    
+    // Touch swipe support for product lightbox
+    let productTouchStartX = 0;
+    let productTouchEndX = 0;
+    
+    if (productLightbox) {
+        productLightbox.addEventListener('touchstart', (e) => {
+            productTouchStartX = e.changedTouches[0].screenX;
+        }, false);
+        
+        productLightbox.addEventListener('touchend', (e) => {
+            productTouchEndX = e.changedTouches[0].screenX;
+            handleProductSwipe();
+        }, false);
+    }
+    
+    function handleProductSwipe() {
+        const swipeThreshold = 50;
+        if (productTouchEndX < productTouchStartX - swipeThreshold) {
+            // Swipe left - next product
+            showNextProduct();
+        }
+        if (productTouchEndX > productTouchStartX + swipeThreshold) {
+            // Swipe right - previous product
+            showPreviousProduct();
+        }
+    }
+});
