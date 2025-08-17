@@ -654,6 +654,14 @@ body {
 }
 
 @media screen and (max-width: 768px) {
+    .about-image img {
+        opacity: 1 !important;
+        transform: none !important;
+        animation: none !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
     .nav-menu {
         position: fixed;
         left: -100%;
