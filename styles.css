@@ -653,11 +653,28 @@ body {
     }
 }
 
+/* Add this to the mobile responsive section around line 700 */
 @media screen and (max-width: 768px) {
+    .about-image {
+        margin-bottom: 2rem;
+    }
+    
+    .about-image::before {
+        top: -10px;
+        left: -10px;
+    }
+    
+    .about-image img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+    }
+    
+    /* Ensure image is visible on mobile even if JS fails */
     .about-image img {
         opacity: 1 !important;
-        transform: none !important;
-        animation: none !important;
+        transform: translateY(0px) !important;
     }
 }
 
@@ -667,7 +684,7 @@ body {
         left: -100%;
         top: 70px;
         flex-direction: column;
-        background-color: var(--cream-white);
+        background-color: var(--warm-brown);
         width: 100%;
         text-align: center;
         transition: 0.3s;

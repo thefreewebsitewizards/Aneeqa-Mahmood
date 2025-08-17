@@ -104,9 +104,20 @@ function initAnimations() {
     // Observe elements for animation
     const animateElements = document.querySelectorAll('.service-card, .about-image img, .about-text');
     animateElements.forEach(el => {
-        // Set initial state
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(30px)';
+        // Check if it's mobile and the about image
+        const isMobile = window.innerWidth <= 768;
+        const isAboutImage = el.matches('.about-image img');
+        
+        if (isMobile && isAboutImage) {
+            // On mobile, ensure about image is always visible
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0px)';
+        } else {
+            // Set initial state for animation
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+        }
+        
         el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         observer.observe(el);
     });
@@ -115,6 +126,17 @@ function initAnimations() {
     const serviceCards = document.querySelectorAll('.service-card');
     serviceCards.forEach((card, index) => {
         card.style.transitionDelay = `${index * 0.1}s`;
+    });
+    
+    // Handle window resize to fix mobile issues
+    window.addEventListener('resize', function() {
+        const isMobile = window.innerWidth <= 768;
+        const aboutImage = document.querySelector('.about-image img');
+        
+        if (isMobile && aboutImage) {
+            aboutImage.style.opacity = '1';
+            aboutImage.style.transform = 'translateY(0px)';
+        }
     });
 }
 
